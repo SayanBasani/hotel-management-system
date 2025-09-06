@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+.a{
+    border: 1px solid red;
+}
+.aa * {
+    border: 1px solid blue;
+}
+
+.b{
+    border: 1px solid green;
+}
+.c{
+    border: 1px solid yellow;
+}
+.d{
+    border: 1px solid purple;
+}
