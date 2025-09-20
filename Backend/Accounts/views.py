@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 def signup(request):
     try:
         data = request.data
-
+        print(data)
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -23,19 +23,15 @@ def signup(request):
             )
         else:
             errors = serializer.errors.copy()
-
-            # If username has errors → move them under email
-            # if "username" in errors:
-            #     if "email" in errors:
-            #         errors["email"].extend(errors["username"])
-            #     else:
-            #         errors["email"] = errors["username"]
-            #     del errors["username"]
+            print("errors :---")
+            print(errors)
             return Response(
                 {"message": "User signup failed!", "errors": errors},
                 status=400
             )
     except Exception as e:
+        print("E :---")
+        print(e)
         return Response({"message": "User signup failed!", "error": str(e)}, status=400)
 
 
@@ -61,10 +57,17 @@ def login_view(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
-    user = request.data
+    user = request.user
     print("user :---- ")
     print(user)
-    return Response({"user": UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+    return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def myAllPermissions(request):
+    user = request.user
+    permissions = user.get_all_permissions()
+    return Response({"permissions": list(permissions)}, status=status.HTTP_200_OK)
 
 @api_view(['POST','GET'])
 @permission_classes([IsAuthenticated])

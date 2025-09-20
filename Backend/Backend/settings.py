@@ -1,13 +1,7 @@
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-pkcj5-ab0im9yc0dj8o36f+_&)i!=cz_@-!+a$xpl$0n!bxn%i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -19,6 +13,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders", # for CORS
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,19 +27,32 @@ INSTALLED_APPS = [
     'django_filters',
 ]
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),   # default: 5 minutes
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),     # default: 1 day
+    "ROTATE_REFRESH_TOKENS": True,                   # optional
+    "BLACKLIST_AFTER_ROTATION": True,                # optional
+}
+
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated'
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         # or 'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # for CORS
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +61,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# for CORS
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
+# ]
+# ! for CORS
 
 ROOT_URLCONF = 'Backend.urls'
 

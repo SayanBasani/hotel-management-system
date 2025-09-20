@@ -7,4 +7,8 @@ urlpatterns = [
     path('Master/', include('Admin.urls')), 
     path('Rooms/', include('Rooms.urls')), 
     path('', account_views.profile , name="profile"),
+
+    path('api/Account/', include('Accounts.urls')), 
+    path('api/Master/', include('Admin.urls')), 
+    path('api/Rooms/', include('Rooms.urls')), 
 ]
