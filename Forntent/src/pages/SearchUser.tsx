@@ -1,100 +1,96 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { getSearchUsers } from "../Storage/Backend_Request";
+import { useStorage } from "../Storage/StorageProvider";
+import { useNavigate } from "react-router";
 
 type SearchInput = {
   query: string;
-  email: string;
 };
 
 export default function SearchUser() {
+  const { Dark } = useStorage();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<SearchInput>();
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<any[]>([]);
 
-  // Dummy data (replace with API later)
-  const users = [
-    "Sayan Basani",
-    "Rohit Sharma",
-    "Ankit Kumar",
-    "Priya Singh",
-    "Sneha Das",
-    "Aman Gupta",
-  ];
-
-  const onSubmit = (data: SearchInput) => {
+  const onSubmit = async (data: SearchInput) => {
     const query = data.query.trim();
     if (!query) {
       setResults([]);
       return;
     }
-    const filtered = users.filter((u) =>
-      u.toLowerCase().includes(query.toLowerCase())
-    );
-    setResults(filtered);
-    reset(); // clear input after search
+    const response = await getSearchUsers({ query });
+    setResults(response || []);
+    reset();
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      {/* Search Box */}
+    <div
+      className={`p-6 max-w-lg mx-auto rounded-lg shadow-md ${
+        Dark ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
+      }`}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex gap-2 mb-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow"
-      >
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            {...register("email", {
-              required: "Email is required",
-              pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
-            })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
-            placeholder="Enter email"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
-        </div>
-        
-        {/* <input
+        className={`flex items-center gap-3 rounded-lg shadow-sm border px-3 py-2 ${
+          Dark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"
+        }`}>
+        <input
           type="text"
-          placeholder="Search user..."
-          {...register("query", { required: true })}
-          className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-400 dark:bg-gray-800 dark:text-white"
-        /> */}
+          {...register("query", { required: "Search query is required" })}
+          className={`flex-1 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+            Dark
+              ? "bg-gray-800 text-white placeholder-gray-400"
+              : "bg-white text-gray-900 placeholder-gray-500"
+          }`}
+          placeholder="Enter name, email or phone..."
+        />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
+          className={`px-5 py-2 rounded-md font-medium transition ${
+            Dark
+              ? "bg-blue-500 hover:bg-blue-600 text-white"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+          }`}>
           Search
         </button>
       </form>
 
-      {/* Validation error */}
       {errors.query && (
-        <p className="text-red-500 text-sm mb-2">Search field is required</p>
+        <p className="text-red-500 text-sm mt-2">{errors.query.message}</p>
       )}
 
-      {/* Results */}
-      <div className="space-y-2">
+      <div className="mt-5 space-y-2">
         {results.length > 0 ? (
           results.map((user, idx) => (
             <div
               key={idx}
-              className="p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white"
-            >
-              {user}
+              onClick={() => {
+                console.log(user);
+                navigate("/user-permissions", { state: { user } });
+              }}
+              className={`p-3 rounded-md shadow-sm cursor-pointer transition transform duration-200 ${
+                Dark
+                  ? "bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 hover:scale-[1.02]"
+                  : "bg-white border border-gray-200 text-gray-900 hover:bg-gray-100 hover:scale-[1.02]"
+              }`}>
+              <p className="font-medium">
+                {user.first_name} {user.last_name}
+              </p>
+              <p className="text-sm opacity-80">{user.email}</p>
             </div>
           ))
         ) : (
-          <p className="text-gray-500 dark:text-gray-400">
-            No results found. Try searching a name.
+          <p
+            className={`mt-4 text-center italic ${
+              Dark ? "text-gray-400" : "text-gray-500"
+            }`}>
+            No results found.
           </p>
         )}
       </div>

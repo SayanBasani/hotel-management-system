@@ -7,8 +7,8 @@ import { Singup_ } from "../../Storage/Backend_Request";
 
 
 type Inputs = {
-  firstname: string;
-  lastname: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -83,7 +83,7 @@ export default function Signup() {
               <input
                 type="text"
                 placeholder="Enter first name"
-                {...register("firstname", {
+                {...register("first_name", {
                   required: "First name is required",
                 })}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none ${
@@ -92,9 +92,9 @@ export default function Signup() {
                     : "bg-gray-50 border-gray-300 text-gray-900"
                 }`}
               />
-              {errors.firstname && (
+              {errors.first_name && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.firstname.message}
+                  {errors.first_name.message}
                 </p>
               )}
             </div>
@@ -107,16 +107,16 @@ export default function Signup() {
               <input
                 type="text"
                 placeholder="Enter last name"
-                {...register("lastname", { required: "Last name is required" })}
+                {...register("last_name", { required: "Last name is required" })}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none ${
                   Dark
                     ? "bg-gray-700 border-gray-600 text-white"
                     : "bg-gray-50 border-gray-300 text-gray-900"
                 }`}
               />
-              {errors.lastname && (
+              {errors.last_name && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.lastname.message}
+                  {errors.last_name.message}
                 </p>
               )}
             </div>

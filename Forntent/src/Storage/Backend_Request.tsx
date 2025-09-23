@@ -1,5 +1,7 @@
 import api from "../config";
 
+// Account
+
 type signup_inp = {
   firstname: string;
   lastname: string;
@@ -35,7 +37,7 @@ export async function Singup_(data: signup_inp) {
 
 export async function Login_(data: Login_inp) {
   try {
-    data.username = data.email
+    data.username = data.email;
     const response = await api.post("Account/login/", data);
     // console.log(response)
     const { access, refresh } = response.data;
@@ -74,7 +76,6 @@ export function getTokenExpiry(token: string) {
   return payload.exp * 1000; // convert to ms
 }
 
-
 export async function refreshAccessToken() {
   try {
     const response = await api.post("/Account/token/refresh/", {
@@ -93,20 +94,10 @@ export async function refreshAccessToken() {
 export async function getOwnProfile() {
   try {
     const response = await api.get("Account/profile/");
-    console.log(response.data);  // contains user info
+    // console.log(response.data);  // contains user info
     return response.data;
   } catch (error) {
     console.error("Error fetching profile:", error);
-    throw error;
-  }
-}
-
-export async function getAllUserList() {
-  try {
-    const response = await api.get("Master/allusers/");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching all users:", error);
     throw error;
   }
 }
@@ -117,6 +108,90 @@ export async function getOwnPermissions() {
     return response.data;
   } catch (error) {
     console.error("Error fetching own permissions:", error);
+    throw error;
+  }
+}
+
+export async function getAllPermissions() {
+  try {
+    const response = await api.get("Master/permissions_list/");
+    return response.data.permissions;
+  } catch (error) {
+    console.error("Error fetching all permissions:", error);
+    throw error;
+  }
+}
+
+export async function assignPermissions(email: string, permissions: string[]) {
+  try {
+    const response = await api.post("Master/assignpermissions/", {
+      email,
+      permissions,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Failed to assign permissions:", error);
+    throw error.response?.data || error;
+  }
+}
+
+export async function getUserPermissions(data: { email: string }) {
+  try {
+    const response = await api.post(`Master/userpermissions/`, data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Failed to get user permissions:", error);
+    throw error.response?.data || error;
+  }
+}
+
+// master
+export async function getAllUserList() {
+  try {
+    const response = await api.get("Master/allusers/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    throw error;
+  }
+}
+
+export async function getAllRoles() {
+  try {
+    const response = await api.get("Master/allroles/");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all roles:", error);
+    throw error;
+  }
+}
+
+export async function getSearchUsers(data: { query: string }) {
+  try {
+    const response = await api.get("Account/filter-users/?q=" + data.query);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    throw error;
+  }
+}
+
+export async function getUserRole(data: { email: string }) {
+  try {
+    const response = await api.post("Master/getUserRole/", data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to get user roles:", error);
+    throw error;
+  }
+}
+
+export async function assignRoleToUser(data: { email: string; role: string }) {
+  try {
+    const response = await api.post("Master/assignRoleToUser/", data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to assign role to user:", error);
     throw error;
   }
 }

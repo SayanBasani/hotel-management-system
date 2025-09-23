@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
-import { getOwnPermissions, getOwnProfile } from "../Storage/Backend_Request";
+import {
+  getOwnPermissions,
+  getOwnProfile,
+  getUserPermissions,
+} from "../Storage/Backend_Request";
 import { useStorage } from "../Storage/StorageProvider";
+import { Link } from "react-router";
 
 export default function Profile() {
   const { Dark } = useStorage();
@@ -48,27 +53,34 @@ export default function Profile() {
     fetchProfile();
     fetchPermissions();
   }, []);
+  useEffect(() => {
+    if (profile?.email) {
+      (async () => {
+        const oldpermissions = await getUserPermissions({
+          email: profile.email,
+        });
+        console.log("Old permissions loaded:", oldpermissions);
+      })();
+    }
+  }, [profile]);
 
   return (
     <div
       className={`h-full ${
         Dark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
-    >
+      }`}>
       {/* Top Navbar */}
       <nav
         className={`flex items-center justify-between px-4 py-3 shadow ${
           Dark ? "bg-gray-800" : "bg-blue-600 text-white"
-        }`}
-      >
+        }`}>
         <h1 className="text-lg font-semibold">My Profile</h1>
         <button
           className="flex items-center gap-2 px-3 py-1 rounded-lg 
                      bg-white text-blue-600 hover:bg-gray-200 transition
-                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600"
-        >
+                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600">
           <i className="bi bi-box-arrow-right text-xl"></i>
-          <span className="hidden sm:inline">Logout</span>
+          <Link to="/login" className="hidden sm:inline">Logout</Link>
         </button>
       </nav>
 
@@ -78,12 +90,13 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+          }`}>
           <h2 className="text-lg font-medium mb-4">Profile Details</h2>
 
           {loadingProfile ? (
-            <p className="text-gray-500 dark:text-gray-400">Loading profile...</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              Loading profile...
+            </p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : profile ? (
@@ -110,12 +123,43 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+          }`}>
           <h2 className="text-lg font-medium mb-4">Roles Details</h2>
 
           {loadingPermissions ? (
-            <p className="text-gray-500 dark:text-gray-400">Loading permissions...</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              Loading permissions...
+            </p>
+          ) : permissions.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {permissions.map((perm: any, index: number) => (
+                <div key={index} className="flex justify-between">
+                  <span>
+                    {perm?.name ||
+                      (perm?.permissions && perm.permissions[0]) ||
+                      JSON.stringify(perm)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              No permissions data available.
+            </p>
+          )}
+        </div>
+
+        {/* Permissions Details */}
+        <div
+          className={`rounded-xl shadow-lg p-4 ${
+            Dark ? "bg-gray-800" : "bg-white"
+          }`}>
+          <h2 className="text-lg font-medium mb-4">Permissions Details</h2>
+
+          {loadingPermissions ? (
+            <p className="text-gray-500 dark:text-gray-400">
+              Loading permissions...
+            </p>
           ) : permissions.length > 0 ? (
             <div className="flex flex-col gap-2">
               {permissions.map((perm: any, index: number) => (

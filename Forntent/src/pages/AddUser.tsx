@@ -2,16 +2,18 @@
 
 import { useForm } from "react-hook-form";
 import { Singup_ } from "../Storage/Backend_Request";
+import { useStorage } from "../Storage/StorageProvider";
 
 type Inputs = {
-  firstname: string;
-  lastname: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   password: string;
 };
 
 export default function AddUser() {
+  const { dark } = useStorage(); // ✅ get dark mode state
   const {
     register,
     handleSubmit,
@@ -40,27 +42,41 @@ export default function AddUser() {
     }
   };
 
+  // ✅ Conditional classes based on dark
+  const containerClasses = `w-full max-w-md mx-auto ${
+    dark ? "text-gray-100" : "text-gray-900"
+  }`;
+  const cardClasses = `space-y-4 p-6 rounded-lg shadow ${
+    dark ? "bg-gray-800" : "bg-white"
+  }`;
+  const inputClasses = `w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 ${
+    dark ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+  }`;
+  const resetBtnClasses = `px-4 py-2 rounded-lg ${
+    dark
+      ? "bg-gray-600 hover:bg-gray-500 text-white"
+      : "bg-gray-300 hover:bg-gray-400 text-black"
+  }`;
+  const submitBtnClasses = `px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white`;
+
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className={containerClasses}>
       <nav className="mb-6">
         <h2 className="text-xl font-semibold">Add New User</h2>
       </nav>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className={cardClasses}>
         {/* First Name */}
         <div>
           <label className="block text-sm font-medium">First Name</label>
           <input
-            {...register("firstname", { required: "First name is required" })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
+            {...register("first_name", { required: "First name is required" })}
+            className={inputClasses}
             placeholder="Enter first name"
           />
-          {errors.firstname && (
+          {errors.first_name && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.firstname.message}
+              {errors.first_name.message}
             </p>
           )}
         </div>
@@ -69,13 +85,13 @@ export default function AddUser() {
         <div>
           <label className="block text-sm font-medium">Last Name</label>
           <input
-            {...register("lastname", { required: "Last name is required" })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
+            {...register("last_name", { required: "Last name is required" })}
+            className={inputClasses}
             placeholder="Enter last name"
           />
-          {errors.lastname && (
+          {errors.last_name && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.lastname.message}
+              {errors.last_name.message}
             </p>
           )}
         </div>
@@ -89,7 +105,7 @@ export default function AddUser() {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
             })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
+            className={inputClasses}
             placeholder="Enter email"
           />
           {errors.email && (
@@ -106,7 +122,7 @@ export default function AddUser() {
               required: "Phone number is required",
               minLength: { value: 10, message: "Must be at least 10 digits" },
             })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
+            className={inputClasses}
             placeholder="Enter phone number"
           />
           {errors.phone && (
@@ -123,7 +139,7 @@ export default function AddUser() {
               required: "Password is required",
               minLength: { value: 6, message: "Minimum 6 characters required" },
             })}
-            className="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 dark:bg-gray-700"
+            className={inputClasses}
             placeholder="Enter password"
           />
           {errors.password && (
@@ -135,17 +151,10 @@ export default function AddUser() {
 
         {/* Buttons */}
         <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500"
-          >
+          <button type="button" onClick={() => reset()} className={resetBtnClasses}>
             Reset
           </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
+          <button type="submit" className={submitBtnClasses}>
             Submit
           </button>
         </div>

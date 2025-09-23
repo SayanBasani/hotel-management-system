@@ -16,7 +16,7 @@ export default function TopNav() {
             <MenuItem icon="bi bi-person-circle"        label="Profile"             to="/profile"           isCollapsed={isCollapsed} />
             <MenuItem icon="bi bi-house"                label="Home"                to="/home"              isCollapsed={isCollapsed} />
             <MenuItem icon="bi bi-people"               label="Manage Users"        to="/manage-users"      isCollapsed={isCollapsed} />
-            <MenuItem icon="bi bi-person-fill-gear"     label="User Permissions"    to="/user-permissions"  isCollapsed={isCollapsed} />
+            {/* <MenuItem icon="bi bi-person-fill-gear"     label="User Permissions"    to="/user-permissions"  isCollapsed={isCollapsed} /> */}
             <MenuItem icon="bi bi-calendar2-plus"       label="Book Room"           to="/book-room"         isCollapsed={isCollapsed} />
             <MenuItem icon="bi bi-person-plus"          label="Add User"            to="/add-user"          isCollapsed={isCollapsed} />
             <MenuItem icon="bi bi-door-closed"          label="Manage Rooms"        to="/manage-rooms"      isCollapsed={isCollapsed} />

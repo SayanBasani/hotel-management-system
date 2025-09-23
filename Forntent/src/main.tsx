@@ -42,7 +42,7 @@ const router = createBrowserRouter([
         element: <ManageUsers />
       },
       {
-        path: "user-permissions",
+        path: "user-permissions/",
         element: <UserPermissions />
       },
       {
