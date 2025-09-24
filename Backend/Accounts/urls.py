@@ -11,8 +11,10 @@ urlpatterns = [
 
     path('profile/', views.profile , name="profile"),
     path('my-permissions/', views.myAllPermissions , name="my_permissions"),
+    path('my-role/', views.myRoles , name="my_role"),
     path('l/', views.login_view , name="login"),
     path('delete-account/', views.deleteAccount , name="deleteAccount"),
     path('delete-user-account/', views.deleteUserAccount , name="deleteUserAccount"),
-    path("filter-users/", views.filterUser, name="filter_users"),
+    path("filter-user/", views.filterUser, name="filter_users"),
+    path("filter-users/", views.filterUserQ, name="filter_users"),
 ]

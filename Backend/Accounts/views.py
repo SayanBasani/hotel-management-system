@@ -102,7 +102,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, customPermissions.CanViewUser])
+@permission_classes([IsAuthenticated, customPermissions.CanViewUser, IsAdminUser])
 def filterUser(request):
     queryset = User.objects.all().order_by("id")
 
@@ -114,4 +114,46 @@ def filterUser(request):
     queryset = filterset.qs
     serializer = UserSerializer(queryset, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+from django.db.models import Q
+
+@api_view(['GET'])
+@permission_classes([customPermissions.CanViewUser, IsAdminUser])
+def filterUserQ(request):
+    """
+    Search users by any field (username, email, first name, last name).
+    Example: /api/filter-users/?q=sayan
+    """
+    try:
+        q = request.GET.get("q", "").strip()
+        queryset = User.objects.all().order_by("id")
+
+        if q:
+            queryset = queryset.filter(
+                Q(username__icontains=q) |
+                Q(email__icontains=q) |
+                Q(first_name__icontains=q) |
+                Q(last_name__icontains=q)
+            )
+
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {"message": "Something went wrong", "error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def myRoles(request):
+    user_data = request.user
+    user = User.objects.get(email = user_data.email)
+    if not user:
+        return Response({"message": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
+    role = user.groups.values_list('name', flat=True)
+    print(role)
+    return Response({"roles": list(role)}, status=status.HTTP_200_OK)
+
 
