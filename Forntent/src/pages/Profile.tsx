@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getOwnPermissions,
   getOwnProfile,
+  getOwnRole,
   getUserPermissions,
 } from "../Storage/Backend_Request";
 import { useStorage } from "../Storage/StorageProvider";
@@ -9,10 +10,15 @@ import { Link } from "react-router";
 
 export default function Profile() {
   const { Dark } = useStorage();
+
   const [profile, setProfile] = useState<any>(null);
   const [permissions, setPermissions] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
+
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [loadingPermissions, setLoadingPermissions] = useState(true);
+  const [loadingRole, setLoadingRole] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,6 +31,27 @@ export default function Profile() {
         console.error(err);
       } finally {
         setLoadingProfile(false);
+      }
+    }
+
+    async function fetchRole() {
+      try {
+        const roleData = await getOwnRole();
+        console.log("Role fetched:", roleData);
+        console.log("Role fetched:", roleData.roles);
+        console.log("Role fetched:", roleData.roles.length);
+        if (Array.isArray(roleData.roles)) {
+          setRoles(roleData.roles);
+        } else if (roleData) {
+          setRoles([roleData]);
+        } else {
+          setRoles([]);
+        }
+      } catch (err) {
+        setError("Failed to load role");
+        console.error(err);
+      } finally {
+        setLoadingRole(false);
       }
     }
 
@@ -51,8 +78,10 @@ export default function Profile() {
     }
 
     fetchProfile();
+    fetchRole();
     fetchPermissions();
   }, []);
+
   useEffect(() => {
     if (profile?.email) {
       (async () => {
@@ -68,19 +97,24 @@ export default function Profile() {
     <div
       className={`h-full ${
         Dark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}>
+      }`}
+    >
       {/* Top Navbar */}
       <nav
         className={`flex items-center justify-between px-4 py-3 shadow ${
           Dark ? "bg-gray-800" : "bg-blue-600 text-white"
-        }`}>
+        }`}
+      >
         <h1 className="text-lg font-semibold">My Profile</h1>
         <button
           className="flex items-center gap-2 px-3 py-1 rounded-lg 
                      bg-white text-blue-600 hover:bg-gray-200 transition
-                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600">
+                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600"
+        >
           <i className="bi bi-box-arrow-right text-xl"></i>
-          <Link to="/login" className="hidden sm:inline">Logout</Link>
+          <Link to="/login" className="hidden sm:inline">
+            Logout
+          </Link>
         </button>
       </nav>
 
@@ -90,7 +124,8 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}>
+          }`}
+        >
           <h2 className="text-lg font-medium mb-4">Profile Details</h2>
 
           {loadingProfile ? (
@@ -119,32 +154,28 @@ export default function Profile() {
           )}
         </div>
 
-        {/* Roles / Permissions Details */}
+        {/* Roles Details */}
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}>
-          <h2 className="text-lg font-medium mb-4">Roles Details</h2>
+          }`}
+        >
+          <h2 className="text-lg font-medium mb-4">Roles</h2>
 
-          {loadingPermissions ? (
-            <p className="text-gray-500 dark:text-gray-400">
-              Loading permissions...
-            </p>
-          ) : permissions.length > 0 ? (
+          {loadingRole ? (
+            <p className="text-gray-500 dark:text-gray-400">Loading roles...</p>
+          ) : roles.length > 0 ? (
             <div className="flex flex-col gap-2">
-              {permissions.map((perm: any, index: number) => (
-                <div key={index} className="flex justify-between">
-                  <span>
-                    {perm?.name ||
-                      (perm?.permissions && perm.permissions[0]) ||
-                      JSON.stringify(perm)}
-                  </span>
+              {roles &&  (
+                <div className="flex justify-between">
+                  <span>{roles.join(', ')}</span>
                 </div>
-              ))}
+              )}
+              {roles?.length === 0 && (<p>No roles assigned.</p>)}
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400">
-              No permissions data available.
+              No role data available.
             </p>
           )}
         </div>
@@ -153,8 +184,9 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}>
-          <h2 className="text-lg font-medium mb-4">Permissions Details</h2>
+          }`}
+        >
+          <h2 className="text-lg font-medium mb-4">Permissions</h2>
 
           {loadingPermissions ? (
             <p className="text-gray-500 dark:text-gray-400">

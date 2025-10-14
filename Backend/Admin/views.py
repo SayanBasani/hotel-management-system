@@ -92,7 +92,6 @@ def assign_permissions(request):
         permissionsToAssign = request.data.get("permissions", [])
 
         print(f"Assigning permissions '{permissionsToAssign}' to user with email: {emailOftheEmployee}")
-
         # Fetch user
         user = User.objects.filter(email=emailOftheEmployee).first()
         if not user:
@@ -100,7 +99,8 @@ def assign_permissions(request):
 
         # Clear existing permissions
         user.user_permissions.clear()
-
+        if len(permissionsToAssign) == 0:
+            return Response({"message": "All permissions removed from user successfully!"}, status=status.HTTP_200_OK)
         # Assign new permissions
         for perm_codename in permissionsToAssign:
             try:

@@ -36,14 +36,10 @@ export default function ManageUsers() {
 
   useEffect(() => {
     fetchUsers();
-    console.log("the perm is :- ");
-    console.log(users);
   }, []);
   return (
     <>
-      {users.isPermission === false && (
-        <NoPermission />
-      )}
+      {users.isPermission === false && <NoPermission />}
       {users.isPermission === true && (
         <div
           className={`h-full ${
@@ -121,7 +117,7 @@ export default function ManageUsers() {
                       <th className="p-2 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="overflow-hidden ">
+                  <tbody className="overflow-hidden">
                     <AllUserList refBtn={ReffBtn} />
 
                     {/* Empty State */}
@@ -157,7 +153,14 @@ export default function ManageUsers() {
 
                 {/* Load AddNewUser Component */}
                 <div className="p-6">
-                  {showAddUser ? <AddUser /> : ""}
+                  {showAddUser ? (
+                    <AddUser
+                      setShowPopup={setShowPopUp}
+                      setShowAddUser={setShowAddUser}
+                    />
+                  ) : (
+                    ""
+                  )}
                   {showSearchUser ? <SearchUser /> : ""}
                 </div>
               </div>

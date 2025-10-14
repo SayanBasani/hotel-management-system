@@ -20,6 +20,8 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [permissionList, setPermissionList] = useState<string[]>([]);
   const [users, setUsers] = useState<any>([]);
+  const [allRoles, setAllRoles] = useState<string[]>([]);
+
   return (
     <AllStorage.Provider
       value={{
@@ -33,6 +35,8 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
         setPermissionList,
         users,
         setUsers,
+        allRoles,
+        setAllRoles,
       }}>
       {children}
     </AllStorage.Provider>

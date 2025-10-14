@@ -2,15 +2,9 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { useStorage } from "../Storage/StorageProvider";
-import {
-  assignPermissions,
-  assignRoleToUser,
-  getAllPermissions,
-  getAllRoles,
-  getUserPermissions,
-  getUserRole,
-} from "../Storage/Backend_Request";
+import { assignPermissions, assignRoleToUser, getAllPermissions, getAllRoles, getUserPermissions, getUserRole, } from "../Storage/Backend_Request";
 import { FaUser, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
+import swal from "sweetalert";
 
 type Permission = {
   id: number;
@@ -34,7 +28,7 @@ type RoleResponse = {
 };
 
 export default function UserPermissions() {
-  const { Dark, permissionList, setPermissionList } = useStorage();
+  const { Dark, permissionList, setPermissionList ,allRoles, setAllRoles } = useStorage();
   const location = useLocation();
 
   // ✅ user always comes from SearchUser
@@ -45,7 +39,6 @@ export default function UserPermissions() {
   const [allPermissions, setAllPermissions] = useState<Permission[]>(
     permissionList ?? []
   );
-  const [allRoles, setAllRoles] = useState<Permission[]>(permissionList ?? []);
   const [userRole, setUserRole] = useState<RoleResponse[]>([]);
 
   const [assignedIds, setAssignedIds] = useState<number[]>(user?.groups ?? []);
@@ -67,13 +60,10 @@ export default function UserPermissions() {
         const oldpermissions = await getUserPermissions({
           email: user.email,
         });
-        // console.log("oldpermissions",oldpermissions)
-        // ✅ set the assignedIds with the IDs from backend
         if (oldpermissions?.user_permissions) {
           setAssignedIds(oldpermissions.user_permissions.map((p: any) => p.id));
         }
 
-        // console.log("Old permissions loaded:", oldpermissions);
         const oldRole = await getUserRole({ email: user.email });
         setUserRole(oldRole?.roles || "No role assigned");
       } catch (err) {
@@ -117,7 +107,7 @@ export default function UserPermissions() {
 
   const handleSave = async () => {
     if (!user) {
-      alert("Please select a user first.");
+      swal("Error", "Please select a user first.", "error");
       return;
     }
     setSaving(true);
@@ -128,16 +118,29 @@ export default function UserPermissions() {
           (id) => allPermissions.find((p) => p.id === id)?.codename || ""
         )
       );
-      alert(data.message || "Permissions updated successfully!");
       const AssigneRoleResponse = await assignRoleToUser({
         email: user.email,
         role: selectedRole,
       });
-      alert(AssigneRoleResponse.message || "Role updated successfully!");
+      setTimeout(() => {
+        swal(
+          "Success",
+          AssigneRoleResponse.message ||
+            "Permissions and Role updated successfully!",
+          "success"
+        );
+        setTimeout(() => {
+          swal(
+            "Success",
+            data.message || "Permissions and Role updated successfully!",
+            "success"
+          );
+        }, 1000);
+      }, 200);
       await loadUserData();
     } catch (err) {
       console.error("Error assigning permissions:", err);
-      alert("Failed to save permissions.");
+      swal("Error", "Failed to save permissions.", "error");
     } finally {
       setSaving(false);
     }
@@ -176,8 +179,7 @@ export default function UserPermissions() {
       className={`p-4 max-w-6xl mx-auto space-y-6 ${
         Dark ? "text-white" : "text-gray-900"
       }`}
-      style={{maxHeight:"15vh"}}
-      >
+      style={{ maxHeight: "15vh" }}>
       {/* Header */}
       <nav
         className={`flex items-center justify-between gap-4 p-4 rounded-xl shadow ${
@@ -240,7 +242,7 @@ export default function UserPermissions() {
               : "bg-white border border-gray-200"
           }`}
           // style={{ maxHeight: "70vh" }}
-          >
+        >
           <h2 className="text-lg font-semibold flex gap-2">
             <span>Current Role :- </span>
             <div className="flex gap-1">
@@ -261,9 +263,9 @@ export default function UserPermissions() {
                   ? "bg-gray-800 text-white border border-gray-700"
                   : "bg-gray-100 text-gray-900 border border-transparent"
               }`}>
-              <option value="">Select a role</option>
+              <option value="">No role to assign</option>
               {/* Map through available roles and create an option for each */}
-              {allRoles.map((role, index) => (
+              {allRoles.map((role: any, index: number) => (
                 <option key={index} value={role.id}>
                   {role.name}
                 </option>

@@ -17,4 +17,5 @@ urlpatterns = [
     path('delete-user-account/', views.deleteUserAccount , name="deleteUserAccount"),
     path("filter-user/", views.filterUser, name="filter_users"),
     path("filter-users/", views.filterUserQ, name="filter_users"),
+    path("add-user/", views.AddNewUser, name="add_user"),
 ]

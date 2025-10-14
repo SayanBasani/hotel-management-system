@@ -6,6 +6,7 @@ from rest_framework import status
 from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from . import customPermissions
 # Create your views here.
 
 @api_view(['POST'])
@@ -33,6 +34,38 @@ def signup(request):
         print("E :---")
         print(e)
         return Response({"message": "User signup failed!", "error": str(e)}, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([customPermissions.CanAddUser, IsAuthenticated])
+def AddNewUser(request):
+    try:
+        data = request.data
+        print("data .:---")
+        print(data)
+        print(len(data))
+        if len(data) == 0:
+            return Response({"message": "You are Authorized"}, status=status.HTTP_200_OK)
+        print(data)
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "New User created successfully!", "data": serializer.data},
+                status=201
+            )
+        else:
+            errors = serializer.errors.copy()
+            print("errors :---")
+            print(errors)
+            return Response(
+                {"message": "New User creation failed!", "errors": errors},
+                status=400
+            )
+    except Exception as e:
+        print("E :---")
+        print(e)
+        return Response({"message": "New User creation failed!", "error": str(e)}, status=400)
 
 
 @api_view(['POST'])
@@ -79,7 +112,6 @@ def deleteAccount(request):
     except Exception as e:
         return Response({"message": "User account deletion failed!", "error": str(e)}, status=400)
 
-from . import customPermissions
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated,customPermissions.CanDeleteUser])

@@ -43,3 +43,13 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #555;             /* darker on hover */
 }
+
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* For IE and Edge */
+  scrollbar-width: none; /* For Firefox */
+}

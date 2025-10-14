@@ -1,7 +1,8 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllUserList } from "../Storage/Backend_Request";
 import { useStorage } from "../Storage/StorageProvider";
 import { useNavigate } from "react-router"; // Make sure to use react-router-dom
+import DeleteUserPopup from "./DeleteUserPopup";
 
 export default function AllUserList({
   refBtn,
@@ -51,6 +52,20 @@ export default function AllUserList({
   useEffect(() => {
     fetchUsers();
   }, []);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const handleDeleteUser = (user: any) => {
+    setSelectedUser(user);
+    setIsPopupOpen(true);
+  };
+  
+  const handleConfirmDelete = (user: any) => {
+    console.log("Deleting user:", user);
+    setIsPopupOpen(false);
+    fetchUsers();
+    // 👉 call your delete API here
+  };
+
   useEffect(() => {
     console.log("users :- ");
     console.log(users);
@@ -58,23 +73,17 @@ export default function AllUserList({
   }, [users]);
   return (
     <>
-      {
-        users.data.map((user: any, index: number) => (
+      {users.data.map((user: any, index: number) => (
+        <>
           <tr
             onClick={() => navigate(`/user-permissions/`, { state: { user } })}
             key={index}
             className={`border-b dark:border-gray-600 transition duration-200 cursor-pointer ${
               Dark ? "hover:bg-gray-700" : "hover:bg-gray-100"
             }`}>
-            {/* Wrap only the cells except action buttons */}
-            {/* <Link
-            to={`/user/${user.email}`}
-            className="contents" // allows Link to act like its children
-          > */}
             <td className="p-2">{index + 1}</td>
             <td className="p-2">{user.first_name + " " + user.last_name}</td>
-            <td className="p-2">{user.email}</td>
-            {/* </Link> */}
+            <td className="p-2" title={`Email: ${user.email}`}>{user.email}</td>
 
             {/* Action buttons */}
             <td className="p-2 text-center flex justify-center gap-2">
@@ -92,13 +101,20 @@ export default function AllUserList({
                 title="Delete"
                 onClick={(e) => {
                   e.stopPropagation(); // prevent row link click
-                  console.log("Delete", user);
+                  handleDeleteUser(user);
                 }}>
                 <i className="bi bi-trash"></i>
               </button>
             </td>
           </tr>
-        ))}
+        </>
+      ))}
+      <DeleteUserPopup
+        user={selectedUser}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        onDeleted={(email: string) => handleConfirmDelete(email)}
+      />
     </>
   );
 }

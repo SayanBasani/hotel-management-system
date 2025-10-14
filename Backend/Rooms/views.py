@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User,Group
@@ -19,7 +19,7 @@ def whoAmI(request):
     return Response({"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, customePermissions.CanAddRoom]) # Only Mannager and Admin Can Add Rooms
+@permission_classes([IsAuthenticated, customePermissions.CanAddRoom,IsAdminUser])# Only Mannager and Admin Can Add Rooms
 def addNewRoom(request):
     try:
         user = request.user
@@ -28,6 +28,10 @@ def addNewRoom(request):
             return Response({"error": "You are not authorized to add a room."},status=status.HTTP_403_FORBIDDEN)
         
         data = request.data
+        print(data)
+        print(len(data))
+        if len(data) == 0 :
+            return Response({"message":"You Autorize to Add Room"},status=status.HTTP_200_OK)
         print("room number :- "+data.get("room_number", ""))
         existing_room = Room.objects.filter(room_number=data.get("room_number", "")).first() # Delete if room number already exists
         if existing_room:
@@ -35,7 +39,7 @@ def addNewRoom(request):
         serializer = RoomSerializer(data = data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Room added successfully"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Room added successfully","room_number": data.get("room_number", "")}, status=status.HTTP_201_CREATED)
     except Exception as e:
         print(f"Error occurred: {e}")
         return Response({"error": "Failed to add room"}, status=status.HTTP_400_BAD_REQUEST)
@@ -94,7 +98,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import RoomFilter
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, customePermissions.CanViewRoom])
+@permission_classes([IsAuthenticated, customePermissions.CanViewRoom,IsAdminUser])
 def filterRoom(request):
     queryset = Room.objects.all().order_by("id")
 

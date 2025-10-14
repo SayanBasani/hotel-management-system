@@ -15,6 +15,8 @@ import Signup from './pages/Accounts/Singup.tsx';
 import AddUser from './pages/AddUser.tsx';
 import ManageUsers from './pages/ManageUsers.tsx';
 import UserPermissions from './pages/UserPermissions.tsx';
+import AddRoom from './pages/Rooms/AddRoom.tsx';
+import RoomList from './pages/Rooms/RoomsList.tsx';
 
 const router = createBrowserRouter([
   {
@@ -44,6 +46,14 @@ const router = createBrowserRouter([
       {
         path: "user-permissions/",
         element: <UserPermissions />
+      },
+      {
+        path: "add-room/",
+        element: <AddRoom />
+      },
+      {
+        path: "manage-rooms/",
+        element: <RoomList />
       },
       {
         path:"*",
