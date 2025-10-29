@@ -47,7 +47,7 @@ export default function AddRoom() {
       : [];
 
     try {
-      const result = await AddNewRoom(data);
+      await AddNewRoom(data);
       swal("Success", "Room added successfully!", "success");
       setMessage({ text: "✅ Room added successfully!", type: "success" });
       reset();

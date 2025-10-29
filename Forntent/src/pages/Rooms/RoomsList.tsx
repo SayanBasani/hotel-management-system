@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Filter, X } from "lucide-react";
 import { FilterRooms } from "../../Storage/Backend_Request";
 import { useStorage } from "../../Storage/StorageProvider";
 import NoPermission from "../../Component/NoPermission";
-import { Link } from "react-router";
+import RoomBooking from "./RoomBooking";
+import AddRoom from "./AddRoom";
 
 export default function RoomList() {
   const { Dark } = useStorage();
@@ -61,7 +62,9 @@ export default function RoomList() {
     setFilters(cleared);
     fetchRooms();
   };
-
+  const [popUp, setShowPopUp] = useState(false);
+  const [BookRoomForUser, setBookRoomForUser] = useState<any>(false);
+  const [addRoom, setAddRoom] = useState(false);
   return (
     <>
       {isPermission === false && <NoPermission />}
@@ -78,8 +81,9 @@ export default function RoomList() {
             <h1 className="text-2xl font-semibold mb-3 md:mb-0">🏨 Room</h1>
             <span className="flex items-center gap-3">
               <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                onClick={() => (setAddRoom(true), setShowPopUp(true))}
+                // onClick={() => (setAddRoom(!addRoom), setShowPopUp(!popUp))}
+                className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
                 <i className="bi bi-house-add text-xl"></i>
                 <span className={`max-md:hidden`}>Add Room</span>
               </button>
@@ -185,22 +189,24 @@ export default function RoomList() {
                 <motion.div
                   key={room.room_number}
                   whileHover={{ scale: 1.02 }}
-                  className={`rounded-xl p-4 shadow-md border ${
+                  className={`rounded-xl p-4 shadow-md border cursor-pointer ${
                     Dark
                       ? "bg-gray-800 border-gray-700"
                       : "bg-gray-50 border-gray-200"
-                  }`}>
-                  <Link to={``}>
-                    <h2 className="text-lg font-semibold mb-2">
-                      {room.room_number}
-                    </h2>
-                    <p>🛏️ Bed: {room.features.bed}</p>
-                    <p>❄️ AC: {room.features.ac ? "Yes" : "No"}</p>
-                    <p>🛁 Bathroom: {room.features.bathroom.type}</p>
-                    <p>👥 Capacity: {room.room_capacity}</p>
-                    <p>💰 ₹{room.price_per_night}/night</p>
-                    <p>📍 {room.location}</p>
-                  </Link>
+                  }`}
+                  onClick={() => {
+                    setShowPopUp(true);
+                    setBookRoomForUser(room);
+                  }}>
+                  <h2 className="text-lg font-semibold mb-2">
+                    {room.room_number}
+                  </h2>
+                  <p>🛏️ Bed: {room.features.bed}</p>
+                  <p>❄️ AC: {room.features.ac ? "Yes" : "No"}</p>
+                  <p>🛁 Bathroom: {room.features.bathroom.type}</p>
+                  <p>👥 Capacity: {room.room_capacity}</p>
+                  <p>💰 ₹{room.price_per_night}/night</p>
+                  <p>📍 {room.location}</p>
                 </motion.div>
               ))}
             </div>
@@ -211,6 +217,41 @@ export default function RoomList() {
             <p className="text-center text-gray-400 mt-10">
               No rooms match your filters.
             </p>
+          )}
+
+          {/* Fullscreen Add User Popup */}
+          {popUp && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+              <div
+                className={`relative w-full max-w-2xl h-[90%] overflow-y-auto rounded-lg shadow-lg ${
+                  Dark ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+                }`}>
+                {/* Close button */}
+                <button
+                  onClick={() => {
+                    setBookRoomForUser(false);
+                    setShowPopUp(false);
+                    setAddRoom(false);
+                  }}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500">
+                  <i className="bi bi-x-lg text-xl"></i>
+                </button>
+
+                {/* Load AddNewUser Component */}
+                <div className="p-6">
+                  {BookRoomForUser ? (
+                    <RoomBooking
+                      data={BookRoomForUser}
+                      // setShowPopup={setShowPopUp}
+                      // setShowAddUser={setShowAddUser}
+                    />
+                  ) : (
+                    ""
+                  )}
+                  {addRoom ? <AddRoom /> : <></>}
+                </div>
+              </div>
+            </div>
           )}
         </motion.div>
       )}

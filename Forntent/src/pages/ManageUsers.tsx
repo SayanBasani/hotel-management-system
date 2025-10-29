@@ -42,7 +42,7 @@ export default function ManageUsers() {
       {users.isPermission === false && <NoPermission />}
       {users.isPermission === true && (
         <div
-          className={`h-full ${
+          className={` h-full ${
             Dark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
           }`}>
           {/* Top Navbar */}

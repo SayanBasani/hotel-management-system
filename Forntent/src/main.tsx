@@ -17,6 +17,7 @@ import ManageUsers from './pages/ManageUsers.tsx';
 import UserPermissions from './pages/UserPermissions.tsx';
 import AddRoom from './pages/Rooms/AddRoom.tsx';
 import RoomList from './pages/Rooms/RoomsList.tsx';
+import BookedRooms from './pages/Rooms/BookedRooms.tsx';
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,14 @@ const router = createBrowserRouter([
       {
         path: "manage-rooms/",
         element: <RoomList />
+      },
+      {
+        path: "room-bookings/",
+        element: <BookedRooms />
+      },
+      {
+        path: "bookings/",
+        element: <BookedRooms />
       },
       {
         path:"*",

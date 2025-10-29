@@ -176,10 +176,11 @@ export default function UserPermissions() {
 
   return (
     <div
-      className={`p-4 max-w-6xl mx-auto space-y-6 ${
+      className={`page-hight-adjustCss p-4 max-w-6xl mx-auto space-y-6 ${
         Dark ? "text-white" : "text-gray-900"
       }`}
-      style={{ maxHeight: "15vh" }}>
+      // style={{ maxHeight: "15vh" }}
+      >
       {/* Header */}
       <nav
         className={`flex items-center justify-between gap-4 p-4 rounded-xl shadow ${

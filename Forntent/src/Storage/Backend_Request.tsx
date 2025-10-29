@@ -2,14 +2,14 @@ import api from "../config";
 
 // Account
 
-type signup_inp = {
+export type signup_inp = {
   firstname: string;
   lastname: string;
   email: string;
   password: string;
 };
 
-type Login_inp = {
+export type Login_inp = {
   username?: string;
   email: string;
   password: string;
@@ -33,6 +33,30 @@ export type RoomData = {
       amenities: string[];
     };
   };
+};
+
+export type BookedRoomListParams = {
+  start_date?: string;
+  end_date?: string;
+};
+
+// Data of booking with the user and room details
+export type BookingData = {
+  room_number: string; // room number or room id
+  user_name: string;
+  user_email: string;
+  user_phone: string;
+  number_of_guests: number;
+  check_in_date: string; // ISO date format
+  check_out_date: string; // ISO date format
+  special_requests?: string;
+  id_proof_type?: string; // e.g., Aadhar, Passport
+  id_proof_number?: string;
+  additional_guests?: {
+    name: string;
+    age: number;
+    relation: string;
+  }[];
 };
 
 export async function Singup_(data: signup_inp) {
@@ -140,7 +164,7 @@ export async function getOwnProfile() {
   try {
     const response = await api.get("Account/profile/");
     // console.log(response.data);  // contains user info
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching profile:", error);
     throw error;
@@ -270,7 +294,7 @@ export async function AddNewRoom(data: RoomData | any) {
     console.error("Failed to add new room:", error);
     throw error;
   }
-} 
+}
 
 export async function getAllRooms() {
   try {
@@ -278,6 +302,27 @@ export async function getAllRooms() {
     return response.data.rooms;
   } catch (error) {
     console.error("Error fetching all rooms:", error);
+    throw error;
+  }
+}
+
+// Room Booking
+export async function RoomBookingCreate(data: RoomData | any) {
+  try {
+    const response = await api.post("Booking/create/", data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to add new room:", error);
+    throw error;
+  }
+}
+
+export async function BookedRoomList(data: BookedRoomListParams) {
+  try {
+    const response = await api.post("Booking/list/", data || {});
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch booked rooms:", error);
     throw error;
   }
 }
@@ -300,4 +345,3 @@ export async function FilterRooms(filters: Record<string, any>) {
     throw error;
   }
 }
-

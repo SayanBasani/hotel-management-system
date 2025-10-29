@@ -22,24 +22,12 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const profileData = await getOwnProfile();
-        setProfile(profileData?.user || profileData || null);
-      } catch (err) {
-        setError("Failed to load profile");
-        console.error(err);
-      } finally {
-        setLoadingProfile(false);
-      }
-    }
-
     async function fetchRole() {
       try {
         const roleData = await getOwnRole();
-        console.log("Role fetched:", roleData);
-        console.log("Role fetched:", roleData.roles);
-        console.log("Role fetched:", roleData.roles.length);
+        // console.log("Role fetched:", roleData);
+        // console.log("Role fetched:", roleData.roles);
+        // console.log("Role fetched:", roleData.roles.length);
         if (Array.isArray(roleData.roles)) {
           setRoles(roleData.roles);
         } else if (roleData) {
@@ -59,16 +47,8 @@ export default function Profile() {
       try {
         const permissionsData = await getOwnPermissions();
         console.log("permissions from API:", permissionsData);
-
-        if (Array.isArray(permissionsData)) {
-          setPermissions(permissionsData);
-        } else if (typeof permissionsData === "string") {
-          setPermissions([{ permissions: [permissionsData] }]);
-        } else if (permissionsData) {
-          setPermissions([permissionsData]);
-        } else {
-          setPermissions([]);
-        }
+        // console.log(permissionsData?.permissions);
+        setPermissions(permissionsData?.permissions);
       } catch (err) {
         console.error("Failed to load permissions:", err);
         setPermissions([]);
@@ -77,40 +57,57 @@ export default function Profile() {
       }
     }
 
+    async function fetchProfile() {
+      try {
+        const profileData = await getOwnProfile();
+        setProfile(profileData.data?.user || profileData.data || null);
+        fetchRole();
+        fetchPermissions();
+      } catch (err) {
+        setError("Failed to load profile");
+        console.error(err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+
     fetchProfile();
-    fetchRole();
-    fetchPermissions();
   }, []);
 
-  useEffect(() => {
-    if (profile?.email) {
-      (async () => {
-        const oldpermissions = await getUserPermissions({
-          email: profile.email,
-        });
-        console.log("Old permissions loaded:", oldpermissions);
-      })();
-    }
-  }, [profile]);
+  // useEffect(() => {
+  //   console.log("permissions ------=");
+  //   console.log(permissions);
+  //   console.log(permissions[0]?.permissions);
+  //   console.log("permissions ------");
+  // }, [permissions]);
+  // useEffect(() => {
+  //   if (profile?.email) {
+  //     (async () => {
+  //       const oldpermissions = await getUserPermissions({
+  //         email: profile.email,
+  //       });
+  //       console.log("Old permissions loaded:", oldpermissions);
+  //     })();
+  //   }
+  // }, [profile]);
 
   return (
     <div
-      className={`h-full ${
-        Dark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
-    >
+      className={`page-hight-adjustCss
+        ${Dark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}
+      `}
+      // className={`custom-scrollbar h-full w-full p-4 md:p-8 rounded-2xl shadow-2xl overflow-y-auto slim-scroll ${ Dark ? "bg-gray-900 text-white" : "bg-white text-gray-900" }`}
+      >
       {/* Top Navbar */}
       <nav
         className={`flex items-center justify-between px-4 py-3 shadow ${
           Dark ? "bg-gray-800" : "bg-blue-600 text-white"
-        }`}
-      >
+        }`}>
         <h1 className="text-lg font-semibold">My Profile</h1>
         <button
           className="flex items-center gap-2 px-3 py-1 rounded-lg 
                      bg-white text-blue-600 hover:bg-gray-200 transition
-                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600"
-        >
+                     dark:bg-gray-700 dark:text-yellow-400 dark:hover:bg-gray-600">
           <i className="bi bi-box-arrow-right text-xl"></i>
           <Link to="/login" className="hidden sm:inline">
             Logout
@@ -124,8 +121,7 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+          }`}>
           <h2 className="text-lg font-medium mb-4">Profile Details</h2>
 
           {loadingProfile ? (
@@ -137,8 +133,8 @@ export default function Profile() {
           ) : profile ? (
             <div className="space-y-3 text-sm">
               <div>
-                <span className="font-medium">Username:</span>{" "}
-                {profile.username}
+                <span className="font-medium">Name:</span>{" "}
+                {profile.first_name} {profile.last_name}
               </div>
               <div>
                 <span className="font-medium">Email:</span> {profile.email}
@@ -158,20 +154,19 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+          }`}>
           <h2 className="text-lg font-medium mb-4">Roles</h2>
 
           {loadingRole ? (
             <p className="text-gray-500 dark:text-gray-400">Loading roles...</p>
           ) : roles.length > 0 ? (
             <div className="flex flex-col gap-2">
-              {roles &&  (
+              {roles && (
                 <div className="flex justify-between">
-                  <span>{roles.join(', ')}</span>
+                  <span>{roles.join(", ")}</span>
                 </div>
               )}
-              {roles?.length === 0 && (<p>No roles assigned.</p>)}
+              {roles?.length === 0 && <p>No roles assigned.</p>}
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400">
@@ -184,8 +179,7 @@ export default function Profile() {
         <div
           className={`rounded-xl shadow-lg p-4 ${
             Dark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+          }`}>
           <h2 className="text-lg font-medium mb-4">Permissions</h2>
 
           {loadingPermissions ? (

@@ -28,6 +28,7 @@ export default function TopNav() {
           items={[
             { label: "Add Room", to: "/add-room", icon: "bi bi-plus-circle" },
             { label: "View Rooms", to: "/manage-rooms", icon: "bi bi-list-ul" },
+            { label: "Bookings", to: "/room-bookings", icon: "bi bi-house-check-fill" },
             // { label: "Room Types", to: "/room-types", icon: "bi bi-grid" },
           ]}
         />

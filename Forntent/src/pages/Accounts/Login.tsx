@@ -22,9 +22,11 @@ export default function Login() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     // console.log("Login Data:", data);
     try {
-      const res = await Login_(data);
-      // console.log("Login success:", res);
-      alert("Login successful!");
+      await Login_(data);
+      // swal("Success", "Room added successfully!", "success");
+
+      swal("Success", "Login Sucessfull!","Success");
+      // alert("Login successful!");
       navigate("/home");
       // navigate("/home", { replace: true });
 
@@ -135,14 +137,14 @@ export default function Login() {
           </button>
 
           {/* Divider */}
-          <div className="hidden flex items-center justify-center my-4">
+          <div className="flex items-center justify-center my-4">
             <span className="border-t w-1/4"></span>
             <span className="px-2 text-sm text-gray-500">or</span>
             <span className="border-t w-1/4"></span>
           </div>
 
           {/* Social Buttons */}
-          <div className="flex gap-3 hidden">
+          <div className="hidden flexgap-3 ">
             <button
               type="button"
               className={`w-1/2 py-2 rounded-md font-medium border flex justify-center items-center gap-2 ${

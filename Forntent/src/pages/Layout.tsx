@@ -1,15 +1,30 @@
 import { useEffect } from "react";
 import TopNav from "../Component/SideNav";
 import { useStorage } from "../Storage/StorageProvider";
-import { Outlet } from "react-router";
-import { getTokenExpiry, refreshAccessToken } from "../Storage/Backend_Request";
+import { Outlet, useNavigate } from "react-router";
+import { getOwnProfile, getTokenExpiry, refreshAccessToken } from "../Storage/Backend_Request";
 
 export default function Layout() {
+  const navigate = useNavigate();
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
-
     async function scheduleRefresh() {
       const access = localStorage.getItem("access");
+      // console.log("access : " + access);
+      console.log("----------------")
+      try {
+        const resp = await getOwnProfile();
+        console.log(resp)
+        console.log("----------------!")
+        // console.log("resp code :- "+resp.code)
+        console.log("resp :- "+resp)
+        
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        navigate("/login");
+      }
+
+
       if (!access) return;
 
       const expiry = getTokenExpiry(access);
