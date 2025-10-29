@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from . import customPermissions
+from Accounts.customPermissions import AnyOfPermissions
 # Create your views here.
 
 @api_view(['POST'])
@@ -37,7 +38,7 @@ def signup(request):
 
 
 @api_view(['POST'])
-@permission_classes([customPermissions.CanAddUser, IsAuthenticated])
+@permission_classes([AnyOfPermissions(customPermissions.CanAddUser,IsAdminUser)])
 def AddNewUser(request):
     try:
         data = request.data
@@ -90,13 +91,22 @@ def login_view(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
-    user = request.user
-    print("user :---- ")
-    print(user)
-    return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+    print(request.data)
+    try:
+        user = request.user
+        print("user permissions:---- ")
+        print(user)
+        # print(user.first_name)
+        # print(user.last_name)
+        # print(UserSerializer(user))
+        return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+    except:
+        return Response({"User":"invalid user data"},status=status.HTTP_401_UNAUTHORIZED)
+
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AnyOfPermissions(IsAuthenticated,customPermissions.CanEditUser)])
 def myAllPermissions(request):
     user = request.user
     permissions = user.get_all_permissions()
@@ -134,7 +144,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, customPermissions.CanViewUser, IsAdminUser])
+@permission_classes([AnyOfPermissions( customPermissions.CanViewUser,customPermissions.CanEditUser, IsAdminUser)])
 def filterUser(request):
     queryset = User.objects.all().order_by("id")
 
@@ -150,7 +160,7 @@ def filterUser(request):
 from django.db.models import Q
 
 @api_view(['GET'])
-@permission_classes([customPermissions.CanViewUser, IsAdminUser])
+@permission_classes([AnyOfPermissions(customPermissions.CanViewUser, IsAdminUser,customPermissions.CanEditUser)])
 def filterUserQ(request):
     """
     Search users by any field (username, email, first name, last name).

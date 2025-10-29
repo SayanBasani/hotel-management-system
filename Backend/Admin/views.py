@@ -7,6 +7,8 @@ from django.contrib.auth.models import User,Group
 from Accounts.serializers import UserSerializer
 from Accounts.models import Roles
 from django.contrib.auth.models import Permission
+from Accounts import customPermissions 
+from Accounts.customPermissions import AnyOfPermissions
 # Create your views here.
 
 @api_view(['GET'])
@@ -19,10 +21,11 @@ def whoAmI(request):
     return Response({"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser,customPermissions.CanEditUser)])  # Only admins can assign roles
 def assign_role(request):
     print(f"hello Admin :- {request.user}")
     # assign role of the user whose email
+    print(request.data)
     try:
         emailOftheEmployee = request.data.get("email")
         roleToAssign = request.data.get("role")
@@ -46,7 +49,7 @@ def assign_role(request):
     return Response({"message": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser,customPermissions.CanAddRole)])
 def addNewRole(request):
     try:
         print(request.data)
@@ -56,16 +59,16 @@ def addNewRole(request):
             return Response({"error": "Role name is required."}, status=status.HTTP_400_BAD_REQUEST)       
         group, created = Group.objects.get_or_create(name=role_name)
         if created:
-            return Response({"message": f"Role '{role_name}' created successfully."},status=status.HTTP_201_CREATED)
+            return Response({"message": f"Role :- '{role_name}' created successfully."},status=status.HTTP_201_CREATED)
         else:
-            return Response({"message": f"Role '{role_name}' already exists."},status=status.HTTP_200_OK)
+            return Response({"message": f"Role :- '{role_name}' already exists."},status=status.HTTP_200_OK)
 
     except Exception as e:
         print(f"Error occurred: {e}")
         return Response({"message": "An error occurred while adding role."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])
 def getAllUserList(request):
     user_data = []
     users = User.objects.all()
@@ -75,7 +78,7 @@ def getAllUserList(request):
     return Response(user_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])
 def getAllRoleList(request):
     role_data = []
     roles = Group.objects.all()
@@ -84,7 +87,7 @@ def getAllRoleList(request):
     return Response(role_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])  # Only admins can assign permissions
 def assign_permissions(request):
     
     try:
@@ -117,7 +120,7 @@ def assign_permissions(request):
         return Response({"message": "An error occurred while assigning permissions."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])  # Only admins can see all permissions
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])
 def getAllPermissions(request):
     try:
         all_permissions = Permission.objects.all().values(
@@ -133,7 +136,7 @@ def getAllPermissions(request):
         )
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])  # Only admins can see user permissions
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])  # Only admins can see user roles
 def userpermissions(request):
     try:
         emailOftheEmployee = request.data.get("email")
@@ -158,7 +161,7 @@ def userpermissions(request):
         )
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])  # Only admins can see user roles
+@permission_classes([AnyOfPermissions(IsAdminUser,customPermissions.CanEditUser)])  # Only admins can see user roles
 def getUserRole(request):
     email = request.data.get("email")
     if not email:
@@ -171,7 +174,7 @@ def getUserRole(request):
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanDeleteUser)])  # Only admins can delete users
 def deleteUser(request):
     try:
         emailOftheEmployee = request.data.get("email")
@@ -187,3 +190,4 @@ def deleteUser(request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return Response({"message": "An error occurred while deleting user."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    

@@ -7,6 +7,7 @@ from django.contrib.auth.models import User,Group
 from .serializers import RoomSerializer
 from .models import Room
 from . import customePermissions 
+from Accounts.customPermissions import AnyOfPermissions 
 # Create your views here.
 
 @api_view(['GET'])
@@ -19,13 +20,13 @@ def whoAmI(request):
     return Response({"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, customePermissions.CanAddRoom,IsAdminUser])# Only Mannager and Admin Can Add Rooms
+@permission_classes([AnyOfPermissions(customePermissions.CanAddRoom, IsAdminUser)])  # Only Manager and Admin Can Add Rooms
 def addNewRoom(request):
     try:
         user = request.user
-        if not (user.groups.filter(name__in=["Manager","Admin"]).exists() or user.is_superuser):
-            print(f"I am Not Authorized For Add Rooms: {user}")
-            return Response({"error": "You are not authorized to add a room."},status=status.HTTP_403_FORBIDDEN)
+        # if not (user.groups.filter(name__in=["Manager","Admin"]).exists() or user.is_superuser):
+        #     print(f"I am Not Authorized For Add Rooms: {user}")
+        #     return Response({"error": "You are not authorized to add a room."},status=status.HTTP_403_FORBIDDEN)
         
         data = request.data
         print(data)
@@ -77,7 +78,7 @@ def deleteRoom(request, room_id = None):
         return Response({"error": "Failed to delete room"}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, customePermissions.CanViewRoom])
+@permission_classes([AnyOfPermissions(customePermissions.CanViewRoom ,IsAdminUser)])
 def getRoomsDetails(request): # Get Room Details
     try:
         user = request.user
@@ -98,7 +99,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import RoomFilter
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, customePermissions.CanViewRoom,IsAdminUser])
+@permission_classes([AnyOfPermissions(customePermissions.CanViewRoom, IsAdminUser)])
 def filterRoom(request):
     queryset = Room.objects.all().order_by("id")
 
@@ -112,7 +113,7 @@ def filterRoom(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, customePermissions.CanEditRoom]) # Only Mannager and Admin Can Edit Rooms
+@permission_classes([AnyOfPermissions(customePermissions.CanEditRoom, IsAdminUser)])  # Only Manager and Admin Can Edit Rooms
 def EditRoom(request):
     try:
         data = request.data
