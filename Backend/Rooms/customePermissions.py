@@ -28,6 +28,6 @@ class CanDeleteBooking(BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.has_perm('Accounts.can_delete_booking')
         
-class CanViewBooking(BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.has_perm('Accounts.can_view_booking')
+# class CanViewBooking(BasePermission):
+#     def has_permission(self, request, view):
+#         return request.user and request.user.has_perm('Accounts.can_view_booking')

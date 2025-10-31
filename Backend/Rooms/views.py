@@ -34,8 +34,11 @@ def addNewRoom(request):
         if len(data) == 0 :
             return Response({"message":"You Autorize to Add Room"},status=status.HTTP_200_OK)
         print("room number :- "+data.get("room_number", ""))
-        existing_room = Room.objects.filter(room_number=data.get("room_number", "")).first() # Delete if room number already exists
-        if existing_room:
+        # if existing_room:
+        room_number=request.data.get("room_number", "")
+        if Room.objects.filter(room_number=room_number).exists():
+            existing_room = Room.objects.filter(room_number=data.get("room_number", "")).first()
+            print(f"Room with room number {room_number} already exists.")
             return Response({"error": "Room with this room number already exists.","room_number": data.get("room_number", "")}, status=status.HTTP_400_BAD_REQUEST)
         serializer = RoomSerializer(data = data)
         if serializer.is_valid():

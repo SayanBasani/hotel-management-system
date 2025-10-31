@@ -123,9 +123,15 @@ def assign_permissions(request):
 @permission_classes([AnyOfPermissions(IsAdminUser, customPermissions.CanEditUser)])
 def getAllPermissions(request):
     try:
-        all_permissions = Permission.objects.all().values(
-            "id", "codename", "name", "content_type__app_label"
-        )
+        Account_permissions = Permission.objects.filter(content_type__app_label='Accounts').values( "id", "codename", "name", "content_type__app_label" )
+        all_permissions = list(Account_permissions)
+        Booking_permissions = Permission.objects.filter(content_type__app_label='Booking').values( "id", "codename", "name", "content_type__app_label" )
+        all_permissions += list(Booking_permissions)
+        Rooms_permissions = Permission.objects.filter(content_type__app_label='Rooms').values( "id", "codename", "name", "content_type__app_label" )
+        all_permissions += list(Rooms_permissions)
+        # all_permissions = Permission.objects.all().values( "id", "codename", "name", "content_type__app_label" )
+        print("type check for all_permissions:")
+        print(type(all_permissions))
         return Response({"permissions": list(all_permissions)}, status=status.HTTP_200_OK)
 
     except Exception as e:

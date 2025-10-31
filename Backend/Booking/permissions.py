@@ -41,3 +41,5 @@ class CanViewBooking(BasePermission):
             and request.user.is_authenticated
             and request.user.has_perm('Accounts.can_view_booking')
         )
+
+

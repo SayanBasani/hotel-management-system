@@ -16,7 +16,6 @@ class Permissions(models.Model):
         permissions=[
             ("can_delete_user", "Can delete user"),
             ("can_view_user", "Can view user"),
-
             ("can_add_user", "Can add user"),
             ("can_edit_user", "Can edit user"),
             # ("can_delete_user", "Can delete user"),
