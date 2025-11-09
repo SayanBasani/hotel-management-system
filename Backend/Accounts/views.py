@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view,permission_classes
+from rest_framework.decorators import api_view,permission_classes,authentication_classes
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from rest_framework.response import Response
 from Accounts.serializers import UserSerializer
@@ -11,6 +11,7 @@ from Accounts.customPermissions import AnyOfPermissions
 # Create your views here.
 
 @api_view(['POST'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def signup(request):
     try:

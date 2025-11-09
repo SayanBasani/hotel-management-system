@@ -18,7 +18,7 @@ def whoAmI(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, permissions.CanAddBooking])
+@permission_classes([IsAdminUser, permissions.CanAddBooking])
 def create_booking(request):
     serializer = BookingSerializer(data=request.data)
     if serializer.is_valid():
@@ -44,7 +44,7 @@ def list_bookings_(request):
 
 
 @api_view(['POST'])
-@permission_classes([AnyOfPermissions(IsAuthenticated,permissions.CanViewBooking)])  # or your custom permission
+@permission_classes([AnyOfPermissions(IsAdminUser, permissions.CanViewBooking)])  # or your custom permission
 def list_bookings(request):
     try:
         start_date = request.data.get('start_date')

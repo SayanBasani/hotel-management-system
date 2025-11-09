@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User,Group
 from .serializers import RoomSerializer
-from .models import Room
-from . import customePermissions 
+from Rooms.models import Room
+from Rooms import customePermissions 
 from Accounts.customPermissions import AnyOfPermissions 
 # Create your views here.
 
